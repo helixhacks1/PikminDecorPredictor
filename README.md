@@ -1,5 +1,5 @@
 # Pikmin Decor Predictor
-A collection of scripts used to analyze Pikmin Bloom decor data and predict what tags are used to generate decors. Python 3.6+ is required to run the scripts. 
+A collection of scripts used to analyze Pikmin Bloom decor data and predict what tags are used to generate decors. Python 3.6+ is required to run the scripts.
 
 ## predict_decors.py
 Script that takes a latitude and longitude as required inputs, and attempts to
@@ -83,6 +83,14 @@ The script is using the [Pikmin Bloom Decor Database](https://docs.google.com/sp
 
 ### Are all these data sources (Foursquare, Yelp, etc.) actually used in the game? Which ones are most important?
 We're extremely confident that OpenStreetMap and Foursquare are both used, so if you were to set up only one developer account, make it Foursquare. There are a fair number of samples that can only be explained by Yelp, and a small handful of samples that only map to Google Places, so our confidence is lower for these two data sources. We provide them as an option here to help rule them in/rule them out.
+
+### How do I install this script?
+This script assumes a basic knowledge of python setup and that the user is using Python 3.6+. If you're new to python, I'd recommend using virtual environments, managed by either [pyenv](https://github.com/pyenv/pyenv) (command-line solution) or [PyCharm CE](https://www.jetbrains.com/pycharm/download/) (Jetbrains GUI based solution). The reason for a tool to manage your environments is if you want to run more scripts with other dependencies in the future, you don't want the configuration for one script to break running another, so having each script run in its own virtual environment keeps everything nice and happy.
+
+Once you've got a solution for managing Python environments set up, you'll want to use the [requirements.txt](requirements.txt) which specifies which dependencies the scripts use.
+- For PyCharm CE, check [here](https://www.jetbrains.com/help/pycharm/managing-dependencies.html) for a guide.
+- For a command line approach, run `python3 -m pip install -r requirements.txt`
+
 
 ### The script timed out/it was canceled part way through. How do I recover?
 There are no plans to add retries to the script. Caches are built as the script finishes any given step. If it fails due to a data source timeout, a temporary loss of internet, etc., rerun the script, it'll skip whatever work was already cached.

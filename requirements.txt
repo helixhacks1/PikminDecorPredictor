@@ -1,0 +1,6 @@
+geopy==2.2.0
+OSMPythonTools==0.3.4
+pandas==1.4.0
+ratelimiter==1.2.0.post0
+requests==2.27.1
+scikit_learn==1.0.2
