@@ -4,6 +4,7 @@ from foursquare_tool import FoursquareTool
 from google_places_tool import GooglePlacesTool
 from yelp_tool import YelpTool
 from decor_type import DecorType
+from dataset import Dataset
 
 from datetime import datetime
 import json
@@ -126,6 +127,10 @@ class PikminDecorPredictor:
     def predict_dataset(self, data, truth, debug_mode=False):
         # initialize list for predictions output
         decor_predictions = []
+        usage_dict = {Dataset.osm: {},
+                      Dataset.foursquare: {},
+                      Dataset.google_places: {},
+                      Dataset.yelp: {}}
         for index, row in data.iterrows():
             # predict row
             prediction_for_row = self.predict_row(row, truth[index])
@@ -133,10 +138,18 @@ class PikminDecorPredictor:
                 prediction_index = 0
                 x = 0
                 for prediction in prediction_for_row:
-                    if prediction == truth[index]:
+                    if prediction.get_decor() == truth[index]:
                         prediction_index = x
+                        # store which tag is used
+                        keys = usage_dict[prediction.get_dataset()].keys()
+                        print(f"{prediction.get_dataset()} == {type(prediction.get_label())}")
+                        if prediction.get_label() in keys:
+                            usage_dict[prediction.get_dataset()][prediction.get_label()] = \
+                                usage_dict[prediction.get_dataset()][prediction.get_label()] + 1
+                        else:
+                            usage_dict[prediction.get_dataset()][prediction.get_label()] = 1
                     x = x + 1
-                decor_predictions.append(prediction_for_row[prediction_index])
+                decor_predictions.append(prediction_for_row[prediction_index].get_decor())
             else:
                 if debug_mode and len(prediction_for_row) == 0 and truth[index] != DecorType.roadside:
                     print("FAILED")
@@ -152,12 +165,26 @@ class PikminDecorPredictor:
                         print(f"Yelp: {row['Yelp Data']}")
                     print("----------------------------")
                 decor_predictions.append(DecorType.roadside)
+        self.print_tag_usage(usage_dict)
         return pd.DataFrame(decor_predictions, columns=['Decor'])
 
     def pretty_print_dict(self, dict):
         for key, value in dict.items():
             decors = [x.value for x in value]
             print(f"{key}: {decors}")
+
+    def print_tag_usage(self, usage_dict):
+        for key, dict in usage_dict.items():
+            i = 0
+            print('==================')
+            print(f"{key}")
+            print('==================')
+            for decor, count in dict.items():
+                i = i + count
+                print(f"{decor}: {count}")
+            print("---------")
+            print(f"Total hits: {i}")
+            print("---------")
 
     def foursquare_enabled(self):
         return self.foursquare_key is not None

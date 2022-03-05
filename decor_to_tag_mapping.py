@@ -4,7 +4,7 @@ from decor_type import DecorType
 osm_decors_to_tags = {
     DecorType.restaurant: [("amenity", "restaurant")],
     DecorType.cafe: [("amenity", "cafe"), ("cuisine", "coffee_shop")],
-    DecorType.sweetshop: [("shop", "pastry"), ("shop", "confectionary")],
+    DecorType.sweetshop: [],
     DecorType.movie_theater: [("amenity", "cinema")],
     DecorType.pharmacy: [("amenity", "pharmacy")],
     DecorType.zoo: [("tourism", "zoo")],

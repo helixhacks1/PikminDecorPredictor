@@ -5,6 +5,8 @@ import json
 import os.path
 import pickle
 from decor_to_tag_mapping import foursquare_decors_to_tags
+from prediction import Prediction
+from dataset import Dataset
 from ratelimiter import RateLimiter
 
 
@@ -22,7 +24,7 @@ class FoursquareTool:
                     category_name = category["name"]
                     for decor_type, tag_list in foursquare_decors_to_tags.items():
                         if category_name in tag_list:
-                            decors.append(decor_type)
+                            decors.append(Prediction(decor_type, Dataset.foursquare, category_name))
         return list(set(decors))
 
     def predict(self, longitude, latitude, radius, seedling_date, burger_shop_start_date, debug_mode=False):
@@ -34,7 +36,7 @@ class FoursquareTool:
             # print(f"running on element {element['name']}")
             decors = self.__predict(element, seedling_date, burger_shop_start_date)
             if len(decors) > 0:
-                ret_dict[element["name"]] = decors
+                ret_dict[element["name"]] = [x.get_decor() for x in decors]
         return ret_dict
 
     def predict_row(self, foursquare_data, seedling_date, burger_shop_start_date):

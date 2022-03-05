@@ -1,5 +1,7 @@
 
 from OSMPythonTools.overpass import overpassQueryBuilder, Overpass
+from prediction import Prediction
+from dataset import Dataset
 from decor_type import DecorType
 from decor_to_tag_mapping import osm_decors_to_tags
 import math
@@ -22,7 +24,7 @@ class OSMTool:
         for result in results:
             decors = self.__predict(result, seedling_date, burger_shop_start_date)
             if len(decors) > 0:
-                ret_dict[result.tags()["name"]] = decors
+                ret_dict[result.tags()["name"]] = [x.get_decor() for x in decors]
         return ret_dict
 
     def __predict(self, osm_data, seedling_date, burger_shop_start_date):
@@ -33,15 +35,15 @@ class OSMTool:
                         seedling_date < burger_shop_start_date and osm_data.tag('amenity') == "fast_food"):
                     # early data shows that fast_food was originally used as restaurant.
                     # Need a bit more data to verify the pattern.
-                    decors.append(DecorType.restaurant)
+                    decors.append(Prediction(DecorType.restaurant, Dataset.osm, "amenity=restaurant"))
             elif decor_type == DecorType.burger_place:
                 if (seedling_date >= burger_shop_start_date and osm_data.tag('amenity') == "fast_food") or osm_data.tag(
                         'cuisine') == 'burger':
-                    decors.append(DecorType.burger_place)
+                    decors.append(Prediction(DecorType.burger_place, Dataset.osm, "amenity=fast_food"))
             else:
                 for tag in tag_list:
                     if osm_data.tag(tag[0]) == tag[1]:
-                        decors.append(decor_type)
+                        decors.append(Prediction(decor_type, Dataset.osm, f"{tag[0]}={tag[1]}"))
         return list(set(decors))
 
     def fill_in_data(self, df, location_tool):

@@ -23,3 +23,5 @@ class DecorType(str, Enum):
     clothes_store = 'Clothing Store'
     park = 'Park'
     roadside = 'Roadside'
+
+

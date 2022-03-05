@@ -26,7 +26,7 @@ def cli_to_args():
     cli.add_argument('-email',
                      type=str,
                      help='Email for Nominatim, required to convert location data to GPS.')
-    cli.add_argument('-foursquare_api_key',  
+    cli.add_argument('-foursquare_api_key',
                      type=str, default=None,
                      help='Required to enable foursquare data. Requires a Foursquare developer account to generate. \
                      Without this option, foursquare is skipped')

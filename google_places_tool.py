@@ -4,6 +4,8 @@ import json
 import os.path
 import pickle
 from decor_to_tag_mapping import google_places_decors_to_tags
+from prediction import Prediction
+from dataset import Dataset
 from ratelimiter import RateLimiter
 
 class GooglePlacesTool:
@@ -22,7 +24,7 @@ class GooglePlacesTool:
             # print(f"running on element {element['name']}")
             decors = self.__predict(element, seedling_date, burger_shop_start_date)
             if len(decors) > 0:
-                ret_dict[element["name"]] = decors
+                ret_dict[element["name"]] = [x.get_decor() for x in decors]
         return ret_dict
 
     def predict_row(self, yelp_data, seedling_date, burger_shop_start_date):
@@ -33,15 +35,16 @@ class GooglePlacesTool:
         if "types" in google_places_data:
             tags = google_places_data["types"]
             for decor_type, tag_list in google_places_decors_to_tags.items():
-                if self.__any_in(tag_list, tags):
-                    decors.append(decor_type)
+                result = self.__any_in(tag_list, tags)
+                if result is not None:
+                    decors.append(Prediction(decor_type, Dataset.google_places, result))
         return decors
 
     def __any_in(self, list_1, list_2):
         for element in list_1:
             if element in list_2:
-                return True
-        return False
+                return element
+        return None
 
     def fill_in_data(self, data, location_tool, debug_mode=False):
         # initialize a dict to cache gps coords for locations

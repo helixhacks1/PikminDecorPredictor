@@ -5,6 +5,8 @@ import json
 import os.path
 import pickle
 from ratelimiter import RateLimiter
+from prediction import Prediction
+from dataset import Dataset
 from decor_to_tag_mapping import yelp_decors_to_tags
 
 class YelpTool:
@@ -26,7 +28,7 @@ class YelpTool:
             # print(f"running on element {element['name']}")
             decors = self.__predict(element, seedling_date, burger_shop_start_date)
             if len(decors) > 0:
-                ret_dict[element["name"]] = decors
+                ret_dict[element["name"]] = [x.get_decor() for x in decors]
         return ret_dict
 
     def __predict(self, yelp_data, seedling_date, burger_shop_start_date):
@@ -34,8 +36,9 @@ class YelpTool:
         if "categories" in yelp_data:
             categories = yelp_data["categories"]
             for decor_type, tag_list in yelp_decors_to_tags.items():
-                if self.find_match(tag_list, categories):
-                    decors.append(decor_type)
+                result = self.find_match(tag_list, categories)
+                if result is not None:
+                    decors.append(Prediction(decor_type, Dataset.yelp, result))
         return decors
 
     def find_match(self, list, yelp_categories):
@@ -43,8 +46,8 @@ class YelpTool:
             for category in yelp_categories:
                 if "alias" in category:
                     if category["alias"] == tag:
-                        return True
-        return False
+                        return tag
+        return None
 
     def fill_in_data(self, data, location_tool, debug_mode=False):
         # initialize a dict to cache gps coords for locations
