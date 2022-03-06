@@ -142,7 +142,6 @@ class PikminDecorPredictor:
                         prediction_index = x
                         # store which tag is used
                         keys = usage_dict[prediction.get_dataset()].keys()
-                        print(f"{prediction.get_dataset()} == {type(prediction.get_label())}")
                         if prediction.get_label() in keys:
                             usage_dict[prediction.get_dataset()][prediction.get_label()] = \
                                 usage_dict[prediction.get_dataset()][prediction.get_label()] + 1
